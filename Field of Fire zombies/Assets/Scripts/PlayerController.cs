@@ -7,15 +7,11 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
-    [SerializeField] private InputActionAsset _playerControls;
-
-
     private PlayerInput _playerInput;
     private InputAction _moveAction;
     private CharacterController _characterController;
     private float _moveSpeed = 5f;
     private float _jumpForce = 4f;
-
     [SerializeField] private float _points = 500;
 
     private bool _isGrounded;
@@ -24,13 +20,12 @@ public class PlayerController : MonoBehaviour
     private Vector3 _playerVelocity;
 
 
-   
     private void Start()
     {
         _camera = Camera.main;
         _characterController = GetComponent<CharacterController>();
         _playerInput = GetComponent<PlayerInput>();
-       
+        _moveAction = _playerInput.actions.FindAction("Movement");
     }
 
     private void Update()
@@ -38,11 +33,10 @@ public class PlayerController : MonoBehaviour
         Movement();
     }
 
-    
-
     public void Movement()
     {
-        
+        Vector2 direction = _moveAction.ReadValue<Vector2>();
+        transform.position += new Vector3 (direction.x, 0, direction.y) * _moveSpeed * Time.deltaTime;
     }
 
     public void Jump()
