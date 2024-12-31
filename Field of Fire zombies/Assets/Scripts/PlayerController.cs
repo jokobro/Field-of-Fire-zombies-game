@@ -1,48 +1,105 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private Camera _camera;
-    private PlayerInput _playerInput;
-    private InputAction _moveAction;
-    private InputAction _jumpAction;
-    private CharacterController _characterController;
-    private float _moveSpeed = 5f;
-    private float _jumpForce = 4f;
-    [SerializeField] private float _points = 500;
-    private bool _isGrounded;
-    private Vector2 _lookPosition;
-    private Vector3 _moveInput;
-    private Vector3 _playerVelocity;
+    private CharacterController characterController;
 
+    [Header("Player Settings")]
+    [SerializeField] private float playerHealth = 100f;
+    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float jumpPower= 10f;
+    [SerializeField] private float gravityMultiplier = 3.0f;
 
-    private void Start()
+    [SerializeField] private int points = 500;
+    
+    [Header("Camera Settings")]
+    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private Camera mainCamera;
+
+    private float gravity = -9.81f;
+    private float verticalVelocity;
+    private Vector3 MoveDirection;
+    private Vector2 input;
+    private float cameraPitch = 0f;
+    
+    private void Awake()
     {
-        _camera = Camera.main;
-        _characterController = GetComponent<CharacterController>();
-        _playerInput = GetComponent<PlayerInput>();
-        _moveAction = _playerInput.actions.FindAction("Movement");
-        _jumpAction = _playerInput.actions.FindAction("Jump");
+        characterController = GetComponent<CharacterController>();
+
+        // Controleer of de camera is toegewezen
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main; // Probeer de hoofdcamera te vinden
+        }
+
+        if (mainCamera == null)
+        {
+            Debug.LogError("PlayerController: No Camera found! Please assign a camera in the Inspector.");
+        }
+
+        // Cursor verbergen en vergrendelen voor FPS
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
     {
-        Movement();
+       if (mainCamera == null) return; // Geen camera? Stop met updaten om crashes te voorkomen
+
+       HandleGravity();
+       HandleMovement();
+       HandleRotation();
     }
 
-    public void Movement()
+    private void HandleGravity()
     {
-        Vector2 direction = _moveAction.ReadValue<Vector2>();
-        transform.position += new Vector3 (direction.x, 0, direction.y) * _moveSpeed * Time.deltaTime;
+        if (IsGrounded() && verticalVelocity < 0) 
+        { 
+          verticalVelocity = -1f;
+        
+        }
+        else
+        {
+            verticalVelocity += gravity * gravityMultiplier * Time.deltaTime;
+        }
+
+        MoveDirection.y = verticalVelocity;
     }
 
-    public void Jump()
+    private void HandleMovement()
     {
-        Vector3 jump = _jumpAction.ReadValue<Vector3>();
-        transform.position += new Vector3(0, jump.y, 0) * _jumpForce * Time.deltaTime;
+        Vector3 move = transform.right * input.x + transform.forward * input.y;
+        characterController.Move(move * walkSpeed * Time.deltaTime + MoveDirection * Time.deltaTime);
     }
+
+    private void HandleRotation()
+    {
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity * Time.deltaTime;
+
+        //rotate the player horizontally
+        transform.Rotate(Vector3.up * mouseDelta.x);
+
+        //adjust camera pitch (vertical rotation)
+        cameraPitch -= mouseDelta.y;
+        cameraPitch = Mathf.Clamp(cameraPitch, -90f, 90f);
+
+        mainCamera.transform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
+    }
+
+    public void Move(InputAction.CallbackContext context)
+    {
+        input = context.ReadValue<Vector2>();
+    }
+
+    public void Jump(InputAction.CallbackContext context)
+    {
+        if (context.started && IsGrounded())
+        {
+            verticalVelocity = jumpPower;
+        }
+    }
+
+    private bool IsGrounded() => characterController.isGrounded;
+
 }
