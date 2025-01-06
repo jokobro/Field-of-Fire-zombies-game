@@ -11,7 +11,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float jumpPower = 10f;
     [SerializeField] private float gravityMultiplier = 3.0f;
-
     [SerializeField] private int points = 500;
 
     [Header("Camera Settings")]
