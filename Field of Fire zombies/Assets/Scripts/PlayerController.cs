@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,25 +9,31 @@ public class PlayerController : MonoBehaviour
     [Header("Player Settings")]
     [SerializeField] private float playerHealth = 100f;
     [SerializeField] private float walkSpeed = 5f;
-    [SerializeField] private float jumpPower= 10f;
+    [SerializeField] private float jumpPower = 10f;
     [SerializeField] private float gravityMultiplier = 3.0f;
 
     [SerializeField] private int points = 500;
-    
+
     [Header("Camera Settings")]
     [SerializeField] private float mouseSensitivity = 2f;
-    [SerializeField] private Camera mainCamera;
+    private Camera mainCamera;
 
     private float gravity = -9.81f;
     private float verticalVelocity;
     private Vector3 MoveDirection;
     private Vector2 input;
     private float cameraPitch = 0f;
-    
+
+    //variable voor pickups
+    private bool isDoublePointsActive;
+
+    private GameManager gameManager;
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
-
+        gameManager = FindObjectOfType<GameManager>();
+        
         // Controleer of de camera is toegewezen
         if (mainCamera == null)
         {
@@ -45,19 +52,20 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-       if (mainCamera == null) return; // Geen camera? Stop met updaten om crashes te voorkomen
+        if (mainCamera == null) return; // Geen camera? Stop met updaten om crashes te voorkomen
 
-       HandleGravity();
-       HandleMovement();
-       HandleRotation();
+        HandleGravity();
+        HandleMovement();
+        HandleRotation();
+        UpdateHealth();
     }
 
     private void HandleGravity()
     {
-        if (IsGrounded() && verticalVelocity < 0) 
-        { 
-          verticalVelocity = -1f;
-        
+        if (IsGrounded() && verticalVelocity < 0)
+        {
+            verticalVelocity = -1f;
+
         }
         else
         {
@@ -102,4 +110,53 @@ public class PlayerController : MonoBehaviour
 
     private bool IsGrounded() => characterController.isGrounded;
 
+
+    private void UpdateHealth()
+    {
+
+
+
+    }
+
+
+
+
+    public void ActivatePowerup(int id, float duration, GameObject powerup)
+    {
+        if (id == 0)
+        {
+            if (!isDoublePointsActive)
+            {
+                ActivateDoublePoints(duration);
+                Destroy(powerup);
+            }
+        }
+        else if (id == 1)
+        {
+            BonusPoints();
+            Destroy(powerup);
+            Debug.Log("bonus points opgepakt");
+        }
+    }
+
+    private void ActivateDoublePoints(float duration)
+    {
+        Debug.Log("double points active");
+        isDoublePointsActive = true;
+        gameManager.scoreMultiplier = 2f;
+        StartCoroutine(DoublePointsCooldown(duration));
+    }
+
+    IEnumerator DoublePointsCooldown(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isDoublePointsActive = false;
+        gameManager.scoreMultiplier = 1f;
+        Debug.Log("double points uitgezet");
+    }
+
+    private void BonusPoints()
+    {
+        gameManager.AddScore(500);
+    }
 }
