@@ -55,7 +55,7 @@ public class Weapon : MonoBehaviour
             shootingSystem.Play();
             Vector3 direction = GetDirection();
 
-            if (Physics.Raycast(bulletSpawnPoint.position, direction, out RaycastHit hit, float.MaxValue, layerMask)
+            if (Physics.Raycast(bulletSpawnPoint.position, direction, out RaycastHit hit, float.MaxValue, layerMask))
             {
                 TrailRenderer trail = Instantiate(bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
 
@@ -101,5 +101,10 @@ public class Weapon : MonoBehaviour
 
             yield return null;
         }
+        animator.SetBool("IsShooting", false);
+        trail.transform.position = hit.point;
+        Instantiate(impactParticleSystem, hit.point, Quaternion.LookRotation(hit.normal));
+
+        Destroy(trail.gameObject, trail.time);
     }
 }
