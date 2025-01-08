@@ -4,15 +4,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController characterController;
-
     [Header("Player Settings")]
     [SerializeField] private float playerHealth = 100f;
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float jumpPower = 10f;
     [SerializeField] private float gravityMultiplier = 3.0f;
     [SerializeField] private int points = 500;
-
     [Header("Camera Settings")]
     [SerializeField] private float mouseSensitivity = 2f;
     private Camera mainCamera;
@@ -27,7 +24,7 @@ public class PlayerController : MonoBehaviour
     private bool isDoublePointsActive;
 
     private GameManager gameManager;
-
+    private CharacterController characterController;
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -64,13 +61,11 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded() && verticalVelocity < 0)
         {
             verticalVelocity = -1f;
-
         }
         else
         {
             verticalVelocity += gravity * gravityMultiplier * Time.deltaTime;
         }
-
         MoveDirection.y = verticalVelocity;
     }
 
@@ -109,15 +104,12 @@ public class PlayerController : MonoBehaviour
 
     private bool IsGrounded() => characterController.isGrounded;
 
-
     private void UpdateHealth()
     {
 
 
 
     }
-
-
 
 
     public void ActivatePowerup(int id, float duration, GameObject powerup)

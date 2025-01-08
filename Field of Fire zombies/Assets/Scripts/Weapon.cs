@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,27 +12,94 @@ public class Weapon : MonoBehaviour
     [SerializeField] private int currentammo = 10;
     [SerializeField] private int refillAmmo = 35;
     [Header("FireRate Settings")]
-    [SerializeField] private float fireRate = 0.6f;
-    private float nextFire;
+    /*[SerializeField] private float fireRate = 0.6f;
+    private float nextFire;*/
+
+    [SerializeField] private bool addBulletSpread = true;
+    [SerializeField] private Vector3 bulletSpreadVariance = new Vector3(0.1f, 0.1f, 0.1f);
+    [SerializeField] private ParticleSystem shootingSystem;
+    [SerializeField] private Transform bulletSpawnPoint;
+    [SerializeField] private ParticleSystem impactParticleSystem;
+    [SerializeField] private TrailRenderer bulletTrail;
+    [SerializeField] private float shootDelay = 0.5f;
+    [SerializeField] private LayerMask layerMask;
+
+    private Animator animator;
+    private float lastShootTime;
 
 
-    private void Start()
+    private void Awake()
     {
-        
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out RaycastHit hitInfo, 20f))
+        {
+            Debug.Log("hit");
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hitInfo.distance, Color.red);
+        }
+        else
+        {
+            Debug.Log("hit nothing");
+        }
     }
 
-    public void HandleShooting(InputAction.CallbackContext context)
+    private void HandleShooting(InputAction.CallbackContext context)
     {
-        if(context.performed && currentClip > 0)
+        /*if (context.performed && currentClip > 0)*/
+        if (lastShootTime + shootDelay < Time.time)
         {
-            nextFire = Time.time + fireRate;
+            animator.SetBool("IsShooting", true);
+            shootingSystem.Play();
+            Vector3 direction = GetDirection();
 
-            currentClip--;
+            if (Physics.Raycast(bulletSpawnPoint.position, direction, out RaycastHit hit, float.MaxValue, layerMask)
+            {
+                TrailRenderer trail = Instantiate(bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
+
+
+                StartCoroutine(SpawnTrail(trail, hit));
+
+                lastShootTime = Time.time;
+            }
+
+        }
+        currentClip--;
+
+    }
+
+    private Vector3 GetDirection()
+    {
+        Vector3 direction = transform.forward;
+
+        if (addBulletSpread)
+        {
+            direction += new Vector3(
+               Random.Range(-bulletSpreadVariance.x, bulletSpreadVariance.x),
+               Random.Range(-bulletSpreadVariance.y, bulletSpreadVariance.y),
+               Random.Range(-bulletSpreadVariance.z, bulletSpreadVariance.z)
+            );
+
+            direction.Normalize();
+        }
+        return direction;
+    }
+
+
+    private IEnumerator SpawnTrail(TrailRenderer trail,RaycastHit hit)
+    {
+        float time = 0;
+
+        Vector3 startPosition  = trail.transform.position;
+
+        while (time < 1)
+        {
+            trail.transform.position = Vector3.Lerp(startPosition, hit.point, time);
+            time += Time.deltaTime / trail.time;
+
+            yield return null;
         }
     }
 }

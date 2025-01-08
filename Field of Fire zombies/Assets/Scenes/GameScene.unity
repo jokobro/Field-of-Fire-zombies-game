@@ -300,6 +300,7 @@ GameObject:
   - component: {fileID: 492311043}
   - component: {fileID: 492311042}
   - component: {fileID: 492311041}
+  - component: {fileID: 492311044}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -372,6 +373,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &492311044
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 492311040}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &561924455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1606,6 +1630,16 @@ MonoBehaviour:
   currentammo: 10
   refillAmmo: 35
   fireRate: 5.96
+  addBulletSpread: 1
+  bulletSpreadVariance: {x: 0.1, y: 0.1, z: 0.1}
+  shootingSystem: {fileID: 0}
+  bulletSpawnPoint: {fileID: 0}
+  impactParticleSystem: {fileID: 0}
+  bulletTrail: {fileID: 0}
+  shootDelay: 0.5
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!65 &1726378001
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1685,12 +1719,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1726377999}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.30694866, y: 2.17, z: 0.9}
-  m_LocalScale: {x: 0.48159, y: 0.15013, z: 1.5856}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.742, y: 1.908, z: 0.323}
+  m_LocalScale: {x: 0.20543185, y: 0.15013, z: 1.5856}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1810344986}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1810344983
 GameObject:
@@ -1768,6 +1802,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1726378004}
   - {fileID: 209521581}
   - {fileID: 847996840}
   m_Father: {fileID: 0}
@@ -2079,5 +2114,4 @@ SceneRoots:
   - {fileID: 2887464}
   - {fileID: 613106482}
   - {fileID: 853398494}
-  - {fileID: 1726378004}
   - {fileID: 492311043}
