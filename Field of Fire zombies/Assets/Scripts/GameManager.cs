@@ -14,11 +14,6 @@ public class GameManager : MonoBehaviour
         pointsUiText.SetText(Points.ToString());
     }
 
-    /*private void Update()
-    {
-        pointsUiText.SetText("" + Points);
-    }*/
-
     public void AddScore(int pointsAmount)
     {
         Points += Mathf.RoundToInt(pointsAmount * scoreMultiplier);

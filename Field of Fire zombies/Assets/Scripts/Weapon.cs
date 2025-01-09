@@ -28,6 +28,11 @@ public class Weapon : MonoBehaviour
     private float lastShootTime;
 
 
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private GameObject fire;
+    [SerializeField] private GameObject hitPoint;
+
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -35,10 +40,29 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out RaycastHit hitInfo, 20f))
+        RaycastHit hit;
+
+
+        if (Physics.Raycast(firePoint.position, transform.TransformDirection(Vector3.forward), out hit, 20))
         {
             Debug.Log("hit");
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hitInfo.distance, Color.red);
+            Debug.DrawRay(firePoint.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.red);
+
+
+            GameObject a = Instantiate(fire, firePoint.position, Quaternion.identity);
+            GameObject b = Instantiate(hitPoint, hit.point, Quaternion.identity);
+
+
+            Destroy(a, 1);
+            Destroy(b, 1);
+
+            BaseEnemy enemy = hit.transform.GetComponent<BaseEnemy>();
+
+            if (enemy != null)
+            {
+                enemy.HandleDamage(20);
+            
+            }
         }
         else
         {
@@ -46,9 +70,9 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private void HandleShooting(InputAction.CallbackContext context)
+   /* private void HandleShooting(InputAction.CallbackContext context)
     {
-        /*if (context.performed && currentClip > 0)*/
+        *//*if (context.performed && currentClip > 0)*//*
         if (lastShootTime + shootDelay < Time.time)
         {
             animator.SetBool("IsShooting", true);
@@ -68,7 +92,7 @@ public class Weapon : MonoBehaviour
         }
         currentClip--;
 
-    }
+    }*/
 
     private Vector3 GetDirection()
     {
