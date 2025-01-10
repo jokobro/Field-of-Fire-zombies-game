@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     [Header("Player Settings")]
     [SerializeField] private float playerHealth = 100f;
@@ -10,9 +11,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpPower = 10f;
     [SerializeField] private float gravityMultiplier = 3.0f;
     [SerializeField] private int points = 500;
-    [Header("Camera Settings")]
+   /* [Header("Camera Settings")]
     [SerializeField] private float mouseSensitivity = 2f;
     private Camera mainCamera;
+
+    [Header("References")]
+    [SerializeField] private Transform target;*/
+
 
     private float gravity = -9.81f;
     private float verticalVelocity;
@@ -25,13 +30,18 @@ public class PlayerController : MonoBehaviour
 
     private GameManager gameManager;
     private CharacterController characterController;
+
+    public static Action shootInput;
+    public static Action ReloadInput;
+    [SerializeField] private KeyCode reloadKey;
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
         gameManager = FindObjectOfType<GameManager>();
-        
+
         // Controleer of de camera is toegewezen
-        if (mainCamera == null)
+       /* if (mainCamera == null)
         {
             mainCamera = Camera.main; // Probeer de hoofdcamera te vinden
         }
@@ -43,17 +53,30 @@ public class PlayerController : MonoBehaviour
 
         // Cursor verbergen en vergrendelen voor FPS
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.visible = false;*/
     }
 
     private void Update()
     {
-        if (mainCamera == null) return; // Geen camera? Stop met updaten om crashes te voorkomen
+      /*  if (mainCamera == null) return; // Geen camera? Stop met updaten om crashes te voorkomen*/
 
         HandleGravity();
         HandleMovement();
-        HandleRotation();
+        /*HandleRotation();*/
         UpdateHealth();
+
+        if (Input.GetMouseButton(0))
+        {
+            shootInput?.Invoke();
+        }
+
+        if (Input.GetKeyDown(reloadKey))
+        {
+            ReloadInput?.Invoke();
+        }
+
+
+
     }
 
     private void HandleGravity()
@@ -75,7 +98,7 @@ public class PlayerController : MonoBehaviour
         characterController.Move(move * walkSpeed * Time.deltaTime + MoveDirection * Time.deltaTime);
     }
 
-    private void HandleRotation()
+    /*private void HandleRotation()
     {
         Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity * Time.deltaTime;
 
@@ -87,7 +110,7 @@ public class PlayerController : MonoBehaviour
         cameraPitch = Mathf.Clamp(cameraPitch, -90f, 90f);
 
         mainCamera.transform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
-    }
+    }*/
 
     public void Move(InputAction.CallbackContext context)
     {
@@ -112,7 +135,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    public void ActivatePowerup(int id, float duration, GameObject powerup)
+    /*public void ActivatePowerup(int id, float duration, GameObject powerup)
     {
         if (id == 0)
         {
@@ -149,5 +172,5 @@ public class PlayerController : MonoBehaviour
     private void BonusPoints()
     {
         gameManager.AddScore(500);
-    }
+    }*/
 }
